@@ -151,6 +151,7 @@
         );
         if (cell) {
           cell.dataset.answer = word[i];
+          cell.dataset.direction = direction; // Set the direction for the word
           if (i === 0) {
             cell.parentElement.querySelector(".number").textContent = clueNumber;
           }
@@ -161,7 +162,7 @@
               cell.style.backgroundColor = "#f8d7da"; // Incorrect
             }
 
-            moveCursorToNextCell(cell); // Automatically move cursor
+            moveCursorInDirection(cell); // Move in the specified direction
           });
         }
       }
@@ -176,25 +177,30 @@
       }
     });
 
-    // Function to move cursor to the next editable cell
-    function moveCursorToNextCell(currentCell) {
-      const inputs = Array.from(document.querySelectorAll("input")).filter(
-        input => !input.disabled
-      );
-      const currentIndex = inputs.indexOf(currentCell);
-      for (let i = currentIndex + 1; i < inputs.length; i++) {
-        const nextInput = inputs[i];
-        if (nextInput.value.toUpperCase() !== nextInput.dataset.answer) {
-          nextInput.focus();
-          return;
-        }
+    // Function to move the cursor in the specified direction
+    function moveCursorInDirection(currentCell) {
+      const direction = currentCell.dataset.direction;
+      const currentRow = parseInt(currentCell.dataset.row);
+      const currentColumn = parseInt(currentCell.dataset.column);
+
+      let nextCell;
+
+      if (direction === "down") {
+        nextCell = document.querySelector(`input[data-row='${currentRow + 1}'][data-column='${currentColumn}']`);
+      } else if (direction === "across") {
+        nextCell = document.querySelector(`input[data-row='${currentRow}'][data-column='${currentColumn + 1}']`);
       }
-      // Restart from the first editable cell with an incorrect value
-      for (let i = 0; i < inputs.length; i++) {
-        const nextInput = inputs[i];
-        if (nextInput.value.toUpperCase() !== nextInput.dataset.answer) {
-          nextInput.focus();
-          return;
+
+      // If the next cell exists and is editable, move to it
+      if (nextCell && !nextCell.disabled) {
+        nextCell.focus();
+      } else {
+        // If no valid next cell, restart at the first editable cell
+        const inputs = Array.from(document.querySelectorAll("input")).filter(
+          input => !input.disabled && input.value.toUpperCase() !== input.dataset.answer
+        );
+        if (inputs.length > 0) {
+          inputs[0].focus();
         }
       }
     }
