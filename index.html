@@ -158,11 +158,10 @@
           cell.addEventListener("input", () => {
             if (cell.value.toUpperCase() === cell.dataset.answer) {
               cell.style.backgroundColor = "#d4edda"; // Correct
+              moveCursorInDirection(cell); // Move in the specified direction
             } else {
               cell.style.backgroundColor = "#f8d7da"; // Incorrect
             }
-
-            moveCursorInDirection(cell); // Move in the specified direction
           });
         }
       }
@@ -194,14 +193,6 @@
       // If the next cell exists and is editable, move to it
       if (nextCell && !nextCell.disabled) {
         nextCell.focus();
-      } else {
-        // If no valid next cell, restart at the first editable cell
-        const inputs = Array.from(document.querySelectorAll("input")).filter(
-          input => !input.disabled && input.value.toUpperCase() !== input.dataset.answer
-        );
-        if (inputs.length > 0) {
-          inputs[0].focus();
-        }
       }
     }
   </script>
