@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Crossword Puzzle</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    #crossword {
+      display: grid;
+      gap: 2px;
+    }
+    .cell {
+      width: calc(5vw); /* Dynamic cell size based on viewport width */
+      height: calc(5vw);
+      text-align: center;
+      border: 1px solid #ccc;
+      background-color: white;
+      font-size: 2vw;
+      position: relative;
+    }
+    .cell.disabled {
+      background-color: #333;
+    }
+    .cell input {
+      width: 100%;
+      height: 100%;
+      border: none;
+      text-align: center;
+      background: none;
+      font-size: inherit;
+      outline: none;
+    }
+    .cell .number {
+      font-size: 0.5em;
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      color: #555;
+    }
+    #clues {
+      max-width: 300px;
+    }
+    .clue-section {
+      margin-bottom: 20px;
+    }
+    .clue {
+      margin-bottom: 10px;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      .cell {
+        width: calc(8vw);
+        height: calc(8vw);
+        font-size: 4vw;
+      }
+    }
+    @media (max-width: 480px) {
+      .cell {
+        width: calc(10vw);
+        height: calc(10vw);
+        font-size: 5vw;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="crossword"></div>
+  <div id="clues">
+    <h2>Clues</h2>
+    <div class="clue-section">
+      <h3>Across</h3>
+      <div id="across-clues"></div>
+    </div>
+    <div class="clue-section">
+      <h3>Down</h3>
+      <div id="down-clues"></div>
+    </div>
+  </div>
+
+  <script>
+    const gridSize = 12; // Adjust grid size for a larger puzzle
+    const words = [
+      { word: "APPLE", direction: "across", row: 1, column: 1, clue: "A type of fruit", clueNumber: 1 },
+      { word: "ANT", direction: "down", row: 1, column: 1, clue: "A small insect, often with a sting", clueNumber: 1 },
+      { word: "GAMES", direction: "across", row: 4, column: 2, clue: "Activities for fun", clueNumber: 2 },
+      { word: "EXPEL", direction: "down", row: 1, column: 5, clue: "Force out or eject", clueNumber: 3 },
+      { word: "PYTHON", direction: "across", row: 7, column: 1, clue: "A programming language", clueNumber: 4 },
+      { word: "ALMOND", direction: "down", row: 4, column: 3, clue: "A type of nut", clueNumber: 5 },
+    ];
+
+    const crossword = document.getElementById("crossword");
+    const acrossClues = document.getElementById("across-clues");
+    const downClues = document.getElementById("down-clues");
+
+    // Generate grid based on gridSize
+    crossword.style.gridTemplateColumns = `repeat(${gridSize}, 1fr)`;
+    crossword.style.gridTemplateRows = `repeat(${gridSize}, 1fr)`;
+
+    for (let row = 1; row <= gridSize; row++) {
+      for (let col = 1; col <= gridSize; col++) {
+        const cell = document.createElement("div");
+        cell.classList.add("cell");
+        const input = document.createElement("input");
+        input.setAttribute("maxlength", "1");
+        input.dataset.row = row;
+        input.dataset.column = col;
+
+        const number = document.createElement("div");
+        number.classList.add("number");
+        cell.appendChild(number);
+        cell.appendChild(input);
+        crossword.appendChild(cell);
+      }
+    }
+
+    // Display clues
+    words.forEach(({ clue, direction, clueNumber }) => {
+      const clueDiv = document.createElement("div");
+      clueDiv.classList.add("clue");
+      clueDiv.textContent = `${clueNumber}. ${clue}`;
+      if (direction === "across") {
+        acrossClues.appendChild(clueDiv);
+      } else {
+        downClues.appendChild(clueDiv);
+      }
+    });
+
+    // Place words and assign numbers manually
+    words.forEach(({ word, direction, row, column, clueNumber }) => {
+      for (let i = 0; i < word.length; i++) {
+        const targetRow = direction === "down" ? row + i : row;
+        const targetColumn = direction === "across" ? column + i : column;
+        const cell = document.querySelector(
+          `.cell input[data-row='${targetRow}'][data-column='${targetColumn}']`
+        );
+        if (cell) {
+          cell.dataset.answer = word[i];
+          if (i === 0) {
+            cell.parentElement.querySelector(".number").textContent = clueNumber;
+          }
+          cell.addEventListener("input", () => {
+            if (cell.value.toUpperCase() === cell.dataset.answer) {
+              cell.style.backgroundColor = "#d4edda"; // Correct
+            } else {
+              cell.style.backgroundColor = "#f8d7da"; // Incorrect
+            }
+          });
+        }
+      }
+    });
+
+    // Disable non-editable cells
+    document.querySelectorAll(".cell").forEach(cell => {
+      const input = cell.querySelector("input");
+      if (!input.dataset.answer) {
+        cell.classList.add("disabled");
+        input.setAttribute("disabled", true);
+      }
+    });
+  </script>
+</body>
+</html>
