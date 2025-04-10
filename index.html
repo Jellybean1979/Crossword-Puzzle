@@ -3,26 +3,34 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Crossword Puzzle</title>
+  <title>Responsive Crossword Puzzle</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      margin: 20px;
+      margin: 0;
+      padding: 0;
       display: flex;
-      flex-wrap: wrap;
+      flex-direction: column;
       justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-color: #f0f0f0;
     }
     #crossword {
       display: grid;
       gap: 2px;
+      max-width: 90vw; /* Scale to fit screen width */
+      max-height: 90vh; /* Scale to fit screen height */
+      grid-template-columns: repeat(12, 1fr); /* Adjust for grid size */
+      grid-template-rows: repeat(12, 1fr);
     }
     .cell {
-      width: calc(5vw); /* Dynamic cell size based on viewport width */
-      height: calc(5vw);
+      width: calc(90vw / 12); /* Dynamic cell size based on grid size */
+      height: calc(90vw / 12);
       text-align: center;
       border: 1px solid #ccc;
       background-color: white;
-      font-size: 2vw;
+      font-size: 1.5vw;
       position: relative;
     }
     .cell.disabled {
@@ -38,35 +46,39 @@
       outline: none;
     }
     .cell .number {
-      font-size: 0.5em;
+      font-size: 0.6em;
       position: absolute;
       top: 2px;
       left: 2px;
       color: #555;
     }
     #clues {
-      max-width: 300px;
+      max-width: 90vw;
+      margin-top: 20px;
     }
     .clue-section {
       margin-bottom: 20px;
     }
     .clue {
       margin-bottom: 10px;
+      font-size: 1vw;
     }
 
-    /* Responsive adjustments */
-    @media (max-width: 768px) {
-      .cell {
-        width: calc(8vw);
-        height: calc(8vw);
-        font-size: 4vw;
+    /* Responsive adjustments for portrait mode */
+    @media (orientation: portrait) {
+      #crossword {
+        max-width: 100%;
+        max-height: 80vh;
+        grid-template-columns: repeat(12, 1fr);
+        grid-template-rows: repeat(12, 1fr);
       }
-    }
-    @media (max-width: 480px) {
       .cell {
-        width: calc(10vw);
-        height: calc(10vw);
-        font-size: 5vw;
+        width: calc(80vw / 12);
+        height: calc(80vw / 12);
+        font-size: 2.5vw; /* Larger font size for readability in portrait mode */
+      }
+      .clue {
+        font-size: 3vw;
       }
     }
   </style>
@@ -101,9 +113,6 @@
     const downClues = document.getElementById("down-clues");
 
     // Generate grid based on gridSize
-    crossword.style.gridTemplateColumns = `repeat(${gridSize}, 1fr)`;
-    crossword.style.gridTemplateRows = `repeat(${gridSize}, 1fr)`;
-
     for (let row = 1; row <= gridSize; row++) {
       for (let col = 1; col <= gridSize; col++) {
         const cell = document.createElement("div");
