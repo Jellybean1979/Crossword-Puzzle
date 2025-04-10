@@ -19,13 +19,13 @@
     #crossword {
       display: grid;
       gap: 2px;
-      max-width: 90vw; /* Scale to fit screen width */
-      max-height: 90vh; /* Scale to fit screen height */
-      grid-template-columns: repeat(12, 1fr); /* Adjust for grid size */
+      max-width: 90vw;
+      max-height: 90vh;
+      grid-template-columns: repeat(12, 1fr);
       grid-template-rows: repeat(12, 1fr);
     }
     .cell {
-      width: calc(90vw / 12); /* Dynamic cell size based on grid size */
+      width: calc(90vw / 12);
       height: calc(90vw / 12);
       text-align: center;
       border: 1px solid #ccc;
@@ -64,7 +64,6 @@
       font-size: 1vw;
     }
 
-    /* Responsive adjustments for portrait mode */
     @media (orientation: portrait) {
       #crossword {
         max-width: 100%;
@@ -75,7 +74,7 @@
       .cell {
         width: calc(80vw / 12);
         height: calc(80vw / 12);
-        font-size: 2.5vw; /* Larger font size for readability in portrait mode */
+        font-size: 2.5vw;
       }
       .clue {
         font-size: 3vw;
@@ -98,7 +97,7 @@
   </div>
 
   <script>
-    const gridSize = 12; // Adjust grid size for a larger puzzle
+    const gridSize = 12;
     const words = [
       { word: "APPLE", direction: "across", row: 1, column: 1, clue: "A type of fruit", clueNumber: 1 },
       { word: "ANT", direction: "down", row: 1, column: 1, clue: "A small insect, often with a sting", clueNumber: 1 },
@@ -112,7 +111,7 @@
     const acrossClues = document.getElementById("across-clues");
     const downClues = document.getElementById("down-clues");
 
-    // Generate grid based on gridSize
+    // Generate grid
     for (let row = 1; row <= gridSize; row++) {
       for (let col = 1; col <= gridSize; col++) {
         const cell = document.createElement("div");
@@ -142,7 +141,7 @@
       }
     });
 
-    // Place words and assign numbers manually
+    // Place words and assign numbers
     words.forEach(({ word, direction, row, column, clueNumber }) => {
       for (let i = 0; i < word.length; i++) {
         const targetRow = direction === "down" ? row + i : row;
@@ -161,6 +160,8 @@
             } else {
               cell.style.backgroundColor = "#f8d7da"; // Incorrect
             }
+
+            moveCursorToNextCell(cell); // Automatically move cursor
           });
         }
       }
@@ -174,6 +175,29 @@
         input.setAttribute("disabled", true);
       }
     });
+
+    // Function to move cursor to the next editable cell
+    function moveCursorToNextCell(currentCell) {
+      const inputs = Array.from(document.querySelectorAll("input")).filter(
+        input => !input.disabled
+      );
+      const currentIndex = inputs.indexOf(currentCell);
+      for (let i = currentIndex + 1; i < inputs.length; i++) {
+        const nextInput = inputs[i];
+        if (nextInput.value.toUpperCase() !== nextInput.dataset.answer) {
+          nextInput.focus();
+          return;
+        }
+      }
+      // Restart from the first editable cell with an incorrect value
+      for (let i = 0; i < inputs.length; i++) {
+        const nextInput = inputs[i];
+        if (nextInput.value.toUpperCase() !== nextInput.dataset.answer) {
+          nextInput.focus();
+          return;
+        }
+      }
+    }
   </script>
 </body>
 </html>
